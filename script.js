@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setStoredBookings(bookings);
 
         renderUserBookings();
-        renderAdminBookings(); // Refresh admin view if necessary
+        renderAdminBookings();
     };
 
     window.handleAdminAction = (bookingId, action) => {
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setStoredBookings(bookings);
         renderAdminBookings();
-        renderUserBookings(); // Ensure user view updates
+        renderUserBookings();
     };
 
     const renderUserBookings = () => {
@@ -556,12 +556,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- User dropdown toggle / outside click close ---
     if (userIconToggle && userDropdown) {
+        // Toggle dropdown when clicking the icon. stopPropagation prevents the document click
+        // handler from immediately closing it.
         userIconToggle.addEventListener('click', (e) => {
             e.preventDefault();
-            setTimeout(() => {
-                userDropdown.classList.toggle('show');
-            }, 10);
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking anywhere else on the document
+        document.addEventListener('click', (e) => {
+            if (!userDropdown.classList.contains('show')) return;
+            // If click is outside both the dropdown and the toggle, close it
+            if (!userDropdown.contains(e.target) && !userIconToggle.contains(e.target)) {
+                userDropdown.classList.remove('show');
+            }
+        });
+
+        // Close dropdown on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && userDropdown.classList.contains('show')) {
+                userDropdown.classList.remove('show');
+                userIconToggle.focus();
+            }
         });
     }
 
