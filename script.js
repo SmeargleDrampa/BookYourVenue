@@ -456,6 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // User Dropdown Toggle
     userIconToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
         userDropdown.classList.toggle('show');
     });
 
