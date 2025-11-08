@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const showLoginBtn = document.getElementById('show-login-btn');
     const logoutBtn = document.getElementById('logout-btn');
     const userIconToggle = document.getElementById('user-icon-toggle');
-    const userDropdown = document.getElementById('user-dropdown');
+    const  = document.getElementById('user-dropdown');
     const currentUsernameSpan = document.getElementById('current-username');
 
     // ADMIN & NAV ELEMENTS
@@ -456,21 +456,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
    // User Dropdown Toggle
 userIconToggle.addEventListener('click', (e) => {
-    // 1. Prevent default behavior
-    e.preventDefault(); 
-    
-    // 2. STOP THE EVENT from propagating to the document handler below
+    // Crucial: Stops the event from reaching the document handler
     e.stopPropagation(); 
     
-    // 3. Toggle the class
+    // Optional, but good practice if the icon is an <a> tag
+    e.preventDefault(); 
+    
     userDropdown.classList.toggle('show');
-});
-
-// Close dropdown when clicking outside (Leave this as is, but ensure it's AFTER the toggle code)
-document.addEventListener('click', (e) => {
-    if (!userIconToggle.contains(e.target) && !userDropdown.contains(e.target)) {
-        userDropdown.classList.remove('show');
-    }
 });
 
     // Logout
