@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Hehe try</title>
+    <link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venue Booking Portal</title>
+    
+    <link rel="stylesheet" href="./style.css">
+    
+  </head>
+    
+  <body>
+
+    <div id="splash-screen">
+        <div class="login-screen">
+            
+            <div class="auth-container">
+                <div class="auth-card" id="login-card">
+                    <h1>Welcome Back!</h1>
+                    <p>Sign in to access your dashboard.</p>
+                    
+                    <form id="login-form">
+                        <div class="input-group">
+                            <label for="login-username">Username or Email</label>
+                            <input type="text" id="login-username" required value="">
+                        </div>
+                        <div class="input-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required value="">
+                        </div>
+                        
+                        <button type="submit" id="login-btn">Log In</button>
+                        <p id="error-message" class="error-text"></p>
+
+                        <p class="switch-auth-mode-text">
+                            New user?
+                            <button type="button" id="show-register-btn" class="switch-btn">Register</button>
+                        </p>
+                    </form>
+                </div>
+
+                <div class="auth-card hidden" id="register-card">
+                    <h1>Register Account</h1>
+                    <p>Create an account to start reserving venues.</p>
+
+                    <form id="register-form">
+                        <div class="input-group">
+                            <label for="register-username">Username</label>
+                            <input type="text" id="register-username" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="register-user-type">User Type</label>
+                            <select id="register-user-type" required>
+                                <option value="Student">Student</option>
+                                <option value="Faculty">Faculty</option>
+                                <option value="External">External</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group hidden" id="admin-key-group">
+                            <label for="register-admin-key">Admin Secret Key</label>
+                            <input type="password" id="register-admin-key">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="register-email">Email</label>
+                            <input type="email" id="register-email" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="register-organization">Organization Name</label>
+                            <input type="text" id="register-organization" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" required>
+                        </div>
+
+                        <button type="submit" id="register-btn">Sign Up</button>
+                        <p id="register-error-message" class="error-text"></p>
+
+                        <p class="switch-auth-mode-text">
+                            Already have an account?
+                            <button type="button" id="show-login-btn" class="switch-btn">Login</button>
+                        </p>
+                    </form>
+                </div>
+            </div>
+
+            <div class="auth-card tracking-card" id="tracking-card">
+                <h1>Track Booking Status</h1>
+                <p>Enter your Reference ID to check its progress.</p>
+                <form id="tracking-form">
+                    <div class="input-group">
+                        <label for="tracking-ref-id">Reference ID</label>
+                        <input type="text" id="tracking-ref-id" required>
+                    </div>
+                    <button type="submit" id="track-btn">Track</button>
+                    <div class="tracking-result">
+                        <p id="tracking-output">Enter an ID above to check its status.</p>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="main-content" class="hidden">
+        <header class="sticky-header">
+            <h2>Venue Reservation Portal</h2>
+            <div class="header-right">
+                <nav>
+                    <a href="#" id="nav-home" class="nav-link active">Home</a>
+                    <a href="#" id="nav-venues" class="nav-link">Venues</a>
+                    <a href="#" id="nav-bookings" class="nav-link">My Bookings</a>
+                    <a href="#" id="nav-admin-review" class="nav-link hidden-admin">Admin Review</a>
+                </nav>
+                <div class="user-controls">
+                    <div id="user-icon-toggle">T</div>
+                    <div class="dropdown-menu" id="user-dropdown">
+                        <p class="dropdown-user">Logged in as: <span id="current-username"></span></p>
+                        <button class="dropdown-item" id="logout-btn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-content">
+            
+            <div id="home-tab" class="portal-tab active">
+                <h1 style="color: #203F4A;">Welcome to the Venue Booking Portal!</h1>
+                <p class="section-description">Use the navigation bar to find available venues or check your current bookings.</p>
+                
+                <div class="carousel-container">
+                    <div class="carousel-slide" id="carousel-slide">
+                        <div class="slide" data-index="0">
+                            <div class="slide-caption">
+                                <h3>Featured Venue: Grand Auditorium</h3>
+                                <p>Perfect for large events, conferences, and graduation ceremonies.</p>
+                                <button class="book-now-btn">Book Now</button>
+                            </div>
+                        </div>
+                        <div class="slide" data-index="1">
+                            <div class="slide-caption">
+                                <h3>Sports Complex</h3>
+                                <p>Courts, fields, and gymnasiums available for team reservations.</p>
+                                <button class="book-now-btn">Book Now</button>
+                            </div>
+                        </div>
+                        <div class="slide" data-index="2">
+                            <div class="slide-caption">
+                                <h3>Conference Room B</h3>
+                                <p>Ideal for meetings and small workshops.</p>
+                                <button class="book-now-btn">Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="prev-btn" id="prev-btn">&#10094;</button>
+                    <button class="next-btn" id="next-btn">&#10095;</button>
+                </div>
+                </div>
+
+            <div id="venues-tab" class="portal-tab">
+                <h1 style="color: #203F4A;">Explore Campus Venues</h1>
+                <p class="section-description">Click on a venue marker to see details and check availability.</p>
+
+                <div class="venue-map-container">
+                    <div class="venue-map-display" id="venue-map-display">
+                        <div id="map-scale-pan-container"> 
+                            
+                            <div class="map-hotspot" data-venue-id="1" style="top: 30%; left: 20%;"></div>
+                            
+                            <div class="map-hotspot reserved" data-venue-id="2" style="top: 55%; left: 70%;"></div>
+                            
+                            <div class="map-hotspot" data-venue-id="3" style="top: 80%; left: 45%;"></div>
+                            
+                            <div class="map-hotspot" data-venue-id="4" style="top: 15%; left: 60%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="venue-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn">&times;</span>
+                        <div id="modal-venue-info">
+                            <h2>Venue Name</h2>
+                            <p>Description and amenities...</p>
+                            <div class="venue-status available">Available</div>
+                            <button id="details-book-btn" class="book-now-btn">Proceed to Booking</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bookings-tab" class="portal-tab">
+                <h1 style="color: #203F4A;">My Bookings</h1>
+                <p class="section-description">View your booking history, upcoming reservations, and cancel pending requests.</p>
+                
+                <div class="booking-system-container">
+                    
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="new-booking-section">New Booking</button>
+                        <button class="tab-btn" data-tab="my-history-section">My History</button>
+                    </div>
+
+                    <div id="new-booking-section" class="tab-content active booking-section">
+                        <h2>Reserve a Venue</h2>
+                        <form id="booking-form">
+                            <div class="booking-group">
+                                <label for="booking-venue">Venue</label>
+                                <select id="booking-venue" required></select>
+                            </div>
+                            <div class="booking-group">
+                                <label for="booking-date">Date</label>
+                                <input type="date" id="booking-date" required>
+                            </div>
+                            <div class="booking-group">
+                                <label for="booking-start-time">Start Time</label>
+                                <input type="time" id="booking-start-time" required>
+                            </div>
+                            <div class="booking-group">
+                                <label for="booking-end-time">End Time</label>
+                                <input type="time" id="booking-end-time" required>
+                            </div>
+                            <div class="booking-group full-width">
+                                <label for="booking-purpose">Purpose of Reservation</label>
+                                <textarea id="booking-purpose" rows="4" placeholder="Briefly describe the event/activity." required></textarea>
+                            </div>
+                            <div class="booking-group full-width">
+                                <label for="booking-requirements-file">Attach Requirements/Permit (Optional)</label>
+                                <input type="file" id="booking-requirements-file" accept=".pdf, .doc, .docx">
+                                <p class="file-note">Upload permits, letters of intent, or other necessary documents.</p>
+                            </div>
+
+                            <button type="submit" id="book-submit-btn">Submit Booking Request</button>
+                        </form>
+                        <p id="booking-message" class="error-text" style="color: #00A99D;"></p>
+                    </div>
+
+                    <div id="my-history-section" class="tab-content booking-section">
+                        <h2>Recent Reservations</h2>
+                        <table id="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th>Ref ID</th>
+                                    <th>Venue</th>
+                                    <th>Date/Time</th>
+                                    <th>Status</th>
+                                    <th>Payment</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+             <tbody>
+                                </tbody>
+                      </table>
+                    </div>
+                </div>
+            </div>
+         
+  
+    
+            <div id="admin-review-tab" class="portal-tab">
+                <h1 style="color: #203F4A;">Admin: Review All Bookings</h1>
+                <p class="section-description">View, approve, or deny booking requests and review requirements.</p>
+
+                <div class="admin-table-container">
+                    <table id="admin-bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Venue</th>
+                                <th>Date/Time</th>
+                                <th>Purpose/Requirements</th>
+                                <th>Payment</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="./script.js"></script>
+
+  </body>
+</html>
+    <script  src="./script.js"></script>
+
+  </body>
+  
+</html>

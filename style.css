@@ -1,0 +1,635 @@
+/* General reset and base styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* NEW: General purpose hidden class to ensure non-auth-card elements are hidden */
+.hidden {
+    display: none !important; 
+}
+
+/* --- COLOR DEFINITIONS --- */
+/* Primary/Text: #203F4A (Dark Slate) */
+/* Accent/Action: #00A99D (Bright Teal) */
+/* Secondary/Light: #EBF2F6 (Light Blue-Gray) */
+
+
+/* --- SPLASH SCREEN CONTAINER --- */
+#splash-screen {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    /* UPDATED: New image background with a dark overlay for readability */
+    background: 
+        linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), /* Dark overlay */
+        url('https://the-post-assets.sgp1.digitaloceanspaces.com/2020/10/CENTRAL-MINDANAO-UNIVERSITY-1.jpg') no-repeat center center fixed;
+    background-size: cover; /* Ensures the image covers the entire screen */
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+/* This is kept for the splash screen itself, using visibility for the fade-out */
+#splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; } 
+#main-content.hidden { display: none; } /* Hide the main content until login */
+
+/* NEW: Layout for multiple items on the login screen */
+.login-screen {
+    width: 100%;
+    height: 100%;
+    display: flex; 
+    justify-content: center;
+    align-items: flex-start;
+    position: relative; 
+    z-index: 1001;
+    padding-top: 10vh;
+    gap: 30px; /* Space between the auth column and the tracking card */
+}
+
+/* NEW: Container to stack Login/Register cards */
+.auth-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    /* FIX: Set a safe height to prevent the now-longer register form from overflowing and blocking the button. */
+    height: 550px; 
+}
+
+/* General card style for all items */
+.auth-card {
+    background-color: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    width: 100%; max-width: 400px; text-align: center; 
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+/* Ensure Login/Register stack on top of each other */
+#login-card, #register-card {
+    position: absolute; 
+    top: 0;
+    left: 0;
+}
+/* FIX: Use opacity and visibility for smooth transitions when switching CARDS. */
+.auth-card.hidden { 
+    opacity: 0; 
+    visibility: hidden;
+    pointer-events: none; /* Prevent clicks from passing through a hidden element */
+    display: block !important; /* Override the generic .hidden to allow transition */
+} 
+.auth-card h1 { color: #203F4A; font-size: 2rem; margin-bottom: 5px; }
+.auth-card p { color: #8C99A0; margin-bottom: 15px; } 
+
+/* ========================================================= */
+/* --- FORM/INPUT STYLES --- */
+/* ========================================================= */
+.auth-card form {
+    /* Base style for forms - ensures single column stack with gaps */
+    display: flex; 
+    flex-direction: column;
+    gap: 1px; 
+}
+.input-group { 
+    text-align: left; 
+    margin: 0; 
+    padding: 0;
+}
+.input-group label { display: block; font-weight: bold; color: #203F4A; margin-bottom: 5px; font-size: 0.9rem; }
+.input-group input, .input-group select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+#login-btn, #register-btn {
+    width: 100%; background-color: #EBF2F6; color: #203F4A; padding: 16px 0; font-weight: bold;
+    border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease, color 0.3s ease; border: none;
+}
+#login-btn:hover, #register-btn:hover { background-color: #203F4A; color: #ffffff; }
+.error-text { color: #d32f2f; font-weight: bold; height: 1.2rem; margin: 0; }
+.switch-auth-mode-text { 
+    padding-top: 3px; 
+    border-top: 1px solid #eee; 
+    margin-top: 2px; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 5px; 
+    font-size: 0.9rem;
+    color: #203F4A;
+}
+.switch-btn { 
+    background: none; border: none; color: #00A99D; font-weight: bold; cursor: pointer; padding: 5px; 
+    transition: color 0.2s; 
+}
+.switch-btn:hover { color: #008779; }
+
+/* NEW: Tracking Card Specific Styles */
+.tracking-card {
+    max-width: 350px; 
+    height: 400px; 
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.tracking-result {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #F7F7F7; 
+    border: 1px solid #ccc;
+    text-align: left;
+    min-height: 80px;
+    color: #203F4A;
+    font-size: 0.9rem;
+}
+.tracking-result p {
+    margin: 2px 0;
+    margin-bottom: 0; 
+}
+#track-btn {
+    background-color: #00A99D;
+    color: white;
+}
+#track-btn:hover {
+    background-color: #008779;
+}
+
+
+/* --- MAIN CONTENT & HEADER (Unchanged) --- */
+#main-content { min-height: 200vh; background-color: #F7F7F7; }
+
+.sticky-header {
+    position: fixed; top: 0; left: 0; width: 100%; background-color: #ffffff; 
+    border-bottom: 3px solid #00A99D; padding: 20px 50px; display: flex;
+    justify-content: flex-start; align-items: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); z-index: 50; 
+}
+.sticky-header h2 { color: #203F4A; }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 30px; }
+.sticky-header nav a {
+    color: #203F4A; text-decoration: none; font-weight: bold; margin: 0 10px; font-size: 1rem; transition: color 0.2s;
+}
+.sticky-header nav a.active { color: #00A99D; } 
+.user-controls { display: flex; align-items: center; position: relative; }
+#user-icon-toggle {
+    font-size: 1.5rem; background-color: #EBF2F6; color: #203F4A; height: 35px; width: 35px; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; 
+}
+.dropdown-menu {
+    position: absolute; top: 50px; right: 0; background-color: #ffffff; border: 1px solid #ccc;
+    border-radius: 4px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); min-width: 200px;
+    display: none; opacity: 0; transition: opacity 0.2s ease; z-index: 100; 
+}
+.dropdown-menu.show { display: block; opacity: 1; }
+.dropdown-menu p.dropdown-user { padding: 10px; color: #203F4A; border-bottom: 1px solid #eee; }
+.dropdown-menu button.dropdown-item {
+    width: 100%; text-align: left; background: none; border: none; padding: 10px; cursor: pointer;
+    color: #d32f2f; transition: background-color 0.2s;
+}
+.dropdown-menu button.dropdown-item:hover { background-color: #fce4ec; color: #a00037; }
+
+.page-content { padding-top: 100px; padding-left: 50px; padding-right: 50px; text-align: center; line-height: 1.6; }
+
+/* --- PORTAL TAB STRUCTURE (Unchanged) --- */
+.portal-tab { display: none; padding-bottom: 50px; }
+.portal-tab.active { display: block; }
+.section-description { margin-bottom: 30px; color: #555; }
+
+/* --- CAROUSEL STYLING (FIXED BUTTON Z-INDEX) --- */
+.carousel-container {
+    max-width: 900px; margin: 40px auto 0; position: relative; overflow: hidden;
+    border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+.carousel-slide { display: flex; transition: transform 0.5s ease-in-out; }
+.slide {
+    min-width: 100%; height: 450px; background-size: cover; background-position: center;
+    position: relative; color: white; text-align: left; 
+    /* Placeholder images for the slides */
+    background-image: url('https://via.placeholder.com/900x450/203F4A/FFFFFF'); 
+}
+.slide:nth-child(2) { background-image: url('https://via.placeholder.com/900x450/00A99D/FFFFFF'); }
+.slide:nth-child(3) { background-image: url('https://via.placeholder.com/900x450/152932/FFFFFF'); }
+
+.slide-caption {
+    position: absolute; bottom: 0; width: 100%; padding: 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+}
+.slide-caption h3 { margin-bottom: 5px; color: white; }
+.slide-caption p { margin-bottom: 15px; color: #EBF2F6; }
+.book-now-btn {
+    background-color: #00A99D; color: white; border: none; padding: 10px 20px;
+    border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.3s;
+}
+.book-now-btn:hover { background-color: #008779; }
+.prev-btn, .next-btn {
+    position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.5);
+    color: white; border: none; padding: 15px 10px; cursor: pointer; font-size: 1.5rem;
+    z-index: 100; /* Increased z-index for visibility over content */
+    opacity: 0.8; transition: opacity 0.3s;
+}
+.prev-btn:hover, .next-btn:hover { opacity: 1; }
+.prev-btn { left: 0; border-radius: 0 4px 4px 0; }
+.next-btn { right: 0; border-radius: 4px 0 0 4px; }
+
+
+/* --- BOOKING SYSTEM STYLES (Unchanged) --- */
+.booking-system-container {
+    background-color: #ffffff; max-width: 800px; margin: 40px auto; padding: 30px;
+    border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); text-align: left;
+}
+.tabs { display: flex; border-bottom: 2px solid #ccc; margin-bottom: 20px; }
+.tab-btn {
+    background: none; border: none; padding: 15px 25px; cursor: pointer; font-size: 1.1rem;
+    font-weight: 600; color: #8C99A0; 
+    border-bottom: 3px solid transparent; transition: color 0.3s, border-bottom 0.3s;
+}
+.tab-btn.active { color: #203F4A; border-bottom: 3px solid #00A99D; }
+#booking-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.booking-group.full-width {
+    grid-column: 1 / -1; 
+}
+#booking-purpose {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical; 
+    font-size: 1rem;
+}
+.file-note {
+    font-size: 0.85rem;
+    color: #555;
+    margin-top: 5px;
+}
+.booking-group label { font-weight: bold; color: #203F4A; margin-bottom: 8px; }
+.booking-group select, 
+.booking-group input[type="date"], 
+.booking-group input[type="time"],
+.booking-group input[type="file"] { 
+    padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; width: 100%; 
+}
+#book-submit-btn {
+    grid-column: 1 / -1; background-color: #00A99D; color: #ffffff; border: none; padding: 15px 0;
+    font-size: 1.1rem; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease; margin-top: 10px;
+}
+#book-submit-btn:hover { background-color: #008779; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ========================================================= */
+/* --- START: MY HISTORY TABLE FIXES --- */
+/* ========================================================= */
+
+#bookings-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 20px; 
+    table-layout: fixed; /* Ensures column widths are respected */
+    min-width: 10px; /* Gives columns more space */
+}
+#bookings-table th, #bookings-table td { 
+    border: 1px solid #eee; 
+    padding: 13px; 
+    text-align: left; 
+    word-wrap: break-word; /* Allows long text to wrap */
+    white-space: normal; /* Resets any 'nowrap' */
+}
+#bookings-table th { 
+    background-color: #EBF2F6; 
+    color: #203F4A; 
+    font-weight: 600; 
+}
+
+/* Set specific widths for "My History" table columns */
+#bookings-table th:nth-child(1) { width: 10%; } /* Ref ID */
+#bookings-table th:nth-child(2) { width: 20%; } /* Venue */
+#bookings-table th:nth-child(3) { width: 25%; } /* Date/Time */
+#bookings-table th:nth-child(4) { width: 15%; } /* Status */
+#bookings-table th:nth-child(5) { width: 15%; } /* Payment */
+#bookings-table th:nth-child(6) { width: 15%; } /* Action */
+
+.cancel-btn { 
+    background-color: #d32f2f; 
+    color: white; 
+    border: none; 
+    padding: 8px 15px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    width: 100%; /* Makes the button fill the cell */
+}
+
+/* ========================================================= */
+/* --- END: MY HISTORY TABLE FIXES --- */
+/* ========================================================= */
+
+
+/* --- VENUES & AMENITIES STYLES (UPDATED FOR MAP) --- */
+
+/* Container for the map and the details panel, using flexbox for side-by-side layout */
+.venue-map-container {
+    
+    max-width: 1200px;
+    margin: 40px auto;
+    text-align: left;
+}
+
+/* Map Display Area - takes up more space */
+.venue-map-display {
+    position: relative;
+    flex-grow: 1;
+    min-width: 100%;
+    height: 600px; /* Fixed height for the map image */
+    background-color: #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* NEW: Disable touch actions like pinch-to-zoom on mobile */
+    touch-action: none;
+    /* Map image is set here as a background image */
+    background-image: url('https://i.ibb.co/sJQvJ4nr/highreslowloa.jpg');
+    background-size: cover;
+    background-position: center;
+    /* NEW: Cursor for dragging state */
+    cursor: grab;
+}
+.venue-map-display:active {
+    cursor: grabbing;
+}
+
+/* NEW: Map inner container for transformations (Pan/Zoom) */
+#map-scale-pan-container {
+    width: 100%;
+    height: 100%;
+    transform-origin: 0 0; /* Important: Scale from top-left */
+    transition: transform 0.05s ease-out; /* Smooth transition for scale/pan */
+    position: relative; /* Must be relative to position the hotspots */
+}
+
+/* Hotspot (Clickable Marker) */
+.map-hotspot {
+    position: absolute;
+    width: 25px; 
+    height: 25px; 
+    border-radius: 50%;
+    background-color: #00A99D; /* Teal marker */
+    border: 3px solid #203F4A; /* Dark border for visibility */
+    cursor: pointer;
+    transform: translate(-50%, -50%); /* Centers the marker on the coordinates */
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 0 0 rgba(0, 169, 157, 0.5); /* Initial box shadow for pulse effect */
+    z-index: 10;
+}
+.map-hotspot:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 0 0 8px rgba(0, 169, 157, 0.4);
+}
+.map-hotspot.reserved {
+    background-color: #d32f2f; /* Red for reserved */
+    border-color: #a00037;
+}
+
+.map-hotspot.reserved {
+     background-color: #d32f2f; /* Red */
+}
+ 
+/* --- MODAL (POP-UP) STYLES - STRONGER FIX APPLIED --- */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; 
+    /* CRITICAL FIX: Higher Z-INDEX to ensure it's on top of everything (z-index: 50 for header) */
+    z-index: 9999; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.6); /* Slightly darker background for emphasis */
+}
+
+.modal.show {
+    display: block !important; /* Ensures the display property is overridden */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* 10% from the top and centered */
+    padding: 30px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more responsive */
+    max-width: 500px; 
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Stronger shadow */
+    position: relative;
+    /* Ensure content is within the high Z-index layer */
+    z-index: 10000; 
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: #203F4A;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#modal-venue-info h2 {
+    color: #00A99D;
+    margin-bottom: 10px;
+}
+
+/* --- BOOKINGS TAB STYLES --- */
+ .booking-section {
+     max-width: 800px;
+}
+
+#map-venue-info p {
+    margin-bottom: 10px;
+    color: #555;
+}
+#map-venue-info .venue-status {
+    display: inline-block;
+    margin-top: 10px;
+}
+#details-book-btn {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.venue-status {
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+.venue-status.available { background-color: #e6ffed; color: #00A99D; }
+.venue-status.reserved { background-color: #F6C9C9; color: #d32f2f; }
+
+
+/* --- ADMIN STYLES (Unchanged) --- */
+.hidden-admin {
+    display: none !important;
+}
+
+.admin-table-container {
+    background-color: #ffffff; 
+    max-width: 100%; 
+    margin: 0 auto; 
+    padding: 20px;
+    border-radius: 8px; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    text-align: center;
+    overflow-x: auto;
+}
+#admin-bookings-table {
+    width: 100%; 
+    border-collapse: collapse;
+}
+#admin-bookings-table th, #admin-bookings-table td { 
+    border: 1px solid #eee; 
+    padding: 10px; 
+    text-align: center; 
+    vertical-align: top;
+    font-size: 0.9rem;
+}
+#admin-bookings-table th { 
+    background-color: #203F4A; 
+    color: #EBF2F6; 
+    font-weight: 600; 
+    white-space: nowrap;
+}
+.action-buttons button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+.approve-btn { background-color: #00A99D; color: white; }
+.deny-btn { background-color: #d32f2f; color: white; }
+.deny-btn:hover { background-color: #a00037; }
+
+/* Status styling for Admin view */
+.status-approved, .status-paid { color: #00A99D; font-weight: bold; }
+.status-pending-review, .status-pending { color: #FFA500; font-weight: bold; }
+.status-denied { color: #d32f2f; font-weight: bold; }
+
+/* ======================================================= */
+/* --- RESPONSIVENESS (Media Query for Tablets/Phones) --- */
+/* ======================================================= */
+@media screen and (max-width: 768px) {
+    
+    /* NEW: Stack the login/tracking cards vertically */
+    .login-screen {
+        flex-direction: column; 
+        gap: 20px;
+        padding-top: 50px; 
+        padding-bottom: 50px;
+        position: static; 
+        height: auto; 
+    }
+    
+    .auth-container {
+        position: static;
+        height: auto; 
+        max-width: 90%; 
+    }
+    
+    .auth-card {
+        position: static;
+        max-width: 100%; 
+        margin: 0 auto;
+    }
+
+    /* Override the desktop grid for the register form on mobile, reverting to a simple stack */
+    #register-form {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .tracking-card {
+        max-width: 90%;
+        margin: 0 auto;
+        height: auto;
+    }
+    
+    #splash-screen {
+        position: static; 
+        height: auto;
+        min-height: 100vh;
+    }
+
+    /* MAP RESPONSIVENESS */
+    .venue-map-container {
+        flex-direction: column; /* Stack map and details vertically */
+        gap: 15px;
+        max-width: 90%;
+    }
+    .venue-map-display {
+        min-width: 100%;
+        height: 400px; /* Reduced height on mobile */
+    }
+    .venue-details-panel {
+        width: 100%;
+    }
+
+
+    /* Header Adjustments */
+    .sticky-header { padding: 15px 20px; flex-wrap: wrap; }
+    .page-content { padding-left: 20px; padding-right: 20px; }
+    .sticky-header h2 { 
+        width: 100%; 
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+        text-align: center;
+    }
+    .header-right { 
+        width: 100%; 
+        justify-content: space-around;
+        margin: 0;
+        gap: 15px; 
+    }
+    .sticky-header nav { order: 2; } 
+    .sticky-header nav a { margin: 0 5px; font-size: 0.9rem; }
+    .user-controls { order: 1; } 
+    
+    /* Booking Form (Switch to single column) */
+    #booking-form { 
+        grid-template-columns: 1fr; 
+        gap: 15px;
+    }
+    .booking-system-container { 
+        margin: 20px auto; 
+        padding: 20px; 
+    }
+    
+    /* Carousel Adjustments */
+    .slide { height: 300px; } 
+    
+    /* Table Adjustments (Force cells to scroll) */
+    #bookings-table, #admin-bookings-table { 
+        display: block; 
+        overflow-x: auto; /* Changed to auto to allow scrolling of the whole table on mobile */
+    }
+}
+
+/* --- FIX: PREVENT UNWANTED AUTO-ZOOM ON FORM INPUT FOCUS --- */
+/* Mobile browsers (especially iOS) auto-zoom on inputs with font-size < 16px. 
+   Setting it to 16px or higher stops this automatic behavior. */
+input[type='text'],
+input[type='password'],
+input[type='email'],
+input[type='number'],
+textarea,
+select {
+    font-size: 16px !important; 
+}
