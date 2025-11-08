@@ -455,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // User Dropdown Toggle
-    userIconToggle.addEventListener('click', () => {
+    userIconToggle.addEventListener('click', (e) => {
         userDropdown.classList.toggle('show');
     });
 
