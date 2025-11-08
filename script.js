@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    'use strict';
+
     // --- STATE VARIABLES & LOCAL STORAGE KEYS ---
     let isAuthenticated = false;
     let currentSlide = 0;
-    const slides = document.querySelectorAll('.carousel-slide .slide');
+    const slides = document.querySelectorAll('.carousel-slide .slide') || [];
     const totalSlides = slides.length;
     const BOOKINGS_KEY = 'venueBookings';
     const USERS_KEY = 'registeredUsers';
@@ -12,12 +14,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // NEW VENUE DATA FOR THE MAP (Coordinates are based on percentage of map width/height)
     const VENUES = [
-        { id: 1, name: "Grand Auditorium", capacity: 500, status: "available", map_x: 20, map_y: 30, details: "The largest venue. Ideal for large conferences, graduation, and major events. Max capacity: 500." },
-        { id: 2, name: "Conference Room A", capacity: 50, status: "reserved", map_x: 70, map_y: 55, details: "Standard meeting room with full AV equipment and video conferencing. Max capacity: 50." },
-        { id: 3, name: "Lecture Hall 101", capacity: 150, status: "available", map_x: 45, map_y: 80, details: "Tiered seating for lectures, seminars, and mid-sized presentations. Max capacity: 150." },
-        { id: 4, name: "Multi-Purpose Hall", capacity: 300, status: "available", map_x: 60, map_y: 15, details: "Flexible space for sports, exhibitions, and social gatherings. Max capacity: 300." },
+        {
+            id: 1,
+            name: 'Grand Auditorium',
+            capacity: 500,
+            status: 'Available',
+            map_x: 20,
+            map_y: 30,
+            details:
+                'The largest venue. Ideal for large conferences, graduation, and major events. Max capacity: 500.',
+        },
+        {
+            id: 2,
+            name: 'Conference Room A',
+            capacity: 50,
+            status: 'Reserved',
+            map_x: 70,
+            map_y: 55,
+            details:
+                'Standard meeting room with full AV equipment and video conferencing. Max capacity: 50.',
+        },
+        {
+            id: 3,
+            name: 'Lecture Hall 101',
+            capacity: 150,
+            status: 'Available',
+            map_x: 45,
+            map_y: 80,
+            details:
+                'Tiered seating for lectures, seminars, and mid-sized presentations. Max capacity: 150.',
+        },
+        {
+            id: 4,
+            name: 'Multi-Purpose Hall',
+            capacity: 300,
+            status: 'Available',
+            map_x: 60,
+            map_y: 15,
+            details:
+                'Flexible space for sports, exhibitions, and social gatherings. Max capacity: 300.',
+        },
     ];
-
 
     // --- DOM ELEMENTS ---
     const splashScreen = document.getElementById('splash-screen');
@@ -26,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerCard = document.getElementById('register-card');
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
+
     // NEW: Admin key field elements
     const registerUserTypeSelect = document.getElementById('register-user-type');
     const adminKeyGroup = document.getElementById('admin-key-group');
@@ -33,28 +71,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // NEW: Tracking Form elements
     const trackingForm = document.getElementById('tracking-form');
-    const trackingCard = document.getElementById('tracking-card');
 
     const showRegisterBtn = document.getElementById('show-register-btn');
     const showLoginBtn = document.getElementById('show-login-btn');
     const logoutBtn = document.getElementById('logout-btn');
     const userIconToggle = document.getElementById('user-icon-toggle');
-    const  = document.getElementById('user-dropdown');
+    const userDropdown = document.getElementById('user-dropdown');
     const currentUsernameSpan = document.getElementById('current-username');
 
     // ADMIN & NAV ELEMENTS
-    const navHome = document.getElementById('nav-home');
-    const navVenues = document.getElementById('nav-venues');
-    const navBookings = document.getElementById('nav-bookings');
     const navAdminReview = document.getElementById('nav-admin-review');
     const venueMapDisplay = document.getElementById('venue-map-display');
-    const venueModal = document.getElementById('venue-modal'); // Assuming HTML uses 'venue-modal'
-    const closeBtn = venueModal ? venueModal.querySelector('.close-btn') : null; // Get the close button
+    const venueModal = document.getElementById('venue-modal');
+    const closeBtn = venueModal ? venueModal.querySelector('.close-btn') : null;
 
     // NEW MAP ELEMENTS
     const mapScalable = document.getElementById('map-scale-pan-container');
-    const mapHotspots = document.querySelectorAll('.map-hotspot');
-
+    const mapHotspots = document.querySelectorAll('.map-hotspot') || [];
 
     // --- UTILITY FUNCTIONS ---
     const getStoredBookings = () => JSON.parse(localStorage.getItem(BOOKINGS_KEY) || '[]');
@@ -63,14 +96,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const setStoredUsers = (users) => localStorage.setItem(USERS_KEY, JSON.stringify(users));
     const getModalInfoPanel = () => document.getElementById('modal-venue-info');
 
-
     // --- RENDER & ACTION FUNCTIONS ---
-
     window.handleCancelBooking = (bookingId) => {
-        if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) return;
+        if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+            return;
+        }
 
         let bookings = getStoredBookings();
-        bookings = bookings.filter(b => b.id !== bookingId);
+        bookings = bookings.filter((b) => b.id !== bookingId);
         setStoredBookings(bookings);
 
         renderUserBookings();
@@ -78,12 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.handleAdminAction = (bookingId, action) => {
-        let bookings = getStoredBookings();
-        const bookingIndex = bookings.findIndex(b => b.id === bookingId);
+        const bookings = getStoredBookings();
+        const bookingIndex = bookings.findIndex((b) => b.id === bookingId);
 
-        if (bookingIndex === -1) return;
+        if (bookingIndex === -1) {
+            return;
+        }
 
-        switch(action) {
+        switch (action) {
             case 'approve':
                 bookings[bookingIndex].approvalStatus = 'Approved';
                 break;
@@ -105,28 +140,41 @@ document.addEventListener('DOMContentLoaded', () => {
         renderUserBookings(); // Ensure user view updates
     };
 
-
     const renderUserBookings = () => {
         const tableBody = document.querySelector('#bookings-table tbody');
-        if (!tableBody) return;
+        if (!tableBody) {
+            return;
+        }
 
         tableBody.innerHTML = '';
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
 
-        if (!currentUser) return;
+        if (!currentUser) {
+            return;
+        }
 
-        const userBookings = getStoredBookings().filter(b => b.userId === currentUser.id);
+        const userBookings = getStoredBookings().filter((b) => b.userId === currentUser.id);
 
-        userBookings.forEach(booking => {
+        userBookings.forEach((booking) => {
             const row = tableBody.insertRow();
 
-            const statusClass = booking.approvalStatus.toLowerCase().replace(' ', '-');
-            const paymentClass = booking.paymentStatus.toLowerCase();
+            const approvalStatus = booking.approvalStatus || 'Pending Review';
+            const paymentStatus = booking.paymentStatus || 'Pending';
 
-            row.innerHTML = `<td>${booking.refId}</td> <td>${booking.venue}</td><td>${booking.date}<br>(${booking.startTime} - ${booking.endTime})</td> <td><span class="status-${statusClass}">${booking.approvalStatus}</span></td> <td><span class="status-${paymentClass}">${booking.paymentStatus}</span></td> <td>
-    ${booking.approvalStatus === 'Pending Review' ?
-                        `<button class="cancel-btn" onclick="handleCancelBooking(${booking.id})">Cancel</button>` :
-                        '-'
+            const statusClass = approvalStatus.toLowerCase().replace(/ /g, '-');
+            const paymentClass = paymentStatus.toLowerCase().replace(/ /g, '-');
+
+            row.innerHTML = `
+                <td>${booking.refId || ''}</td>
+                <td>${booking.venue || ''}</td>
+                <td>${booking.date || ''}<br>(${booking.startTime || ''} - ${booking.endTime || ''})</td>
+                <td><span class="status-${statusClass}">${approvalStatus}</span></td>
+                <td><span class="status-${paymentClass}">${paymentStatus}</span></td>
+                <td>
+                    ${
+                        approvalStatus === 'Pending Review'
+                            ? `<button class="cancel-btn" onclick="handleCancelBooking(${booking.id})">Cancel</button>`
+                            : '-'
                     }
                 </td>
             `;
@@ -135,39 +183,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderAdminBookings = () => {
         const tableBody = document.querySelector('#admin-bookings-table tbody');
-        if (!tableBody) return;
+        if (!tableBody) {
+            return;
+        }
 
         tableBody.innerHTML = '';
         const bookings = getStoredBookings();
 
-        bookings.forEach(booking => {
+        bookings.forEach((booking) => {
             const row = tableBody.insertRow();
 
-            const statusClass = booking.approvalStatus.toLowerCase().replace(' ', '-');
-            const paymentClass = booking.paymentStatus.toLowerCase();
+            const approvalStatus = booking.approvalStatus || 'Pending Review';
+            const paymentStatus = booking.paymentStatus || 'Pending';
+
+            const statusClass = approvalStatus.toLowerCase().replace(/ /g, '-');
+            const paymentClass = paymentStatus.toLowerCase().replace(/ /g, '-');
 
             // 1. Ref ID
-            row.insertCell().textContent = booking.refId;
-          
+            row.insertCell().textContent = booking.refId || '';
+
             // 2. User/Role
-            row.insertCell().textContent = booking.username;
-            row.insertCell().textContent = booking.userRole;
+            row.insertCell().textContent = booking.username || '';
+            row.insertCell().textContent = booking.userRole || '';
+
             // 3. Venue
-            row.insertCell().textContent = booking.venue;
+            row.insertCell().textContent = booking.venue || '';
+
             // 4. Date/Time
-            row.insertCell().innerHTML = `${booking.date}<br>(${booking.startTime} - ${booking.endTime})`;
+            row.insertCell().innerHTML = `${booking.date || ''}<br>(${booking.startTime || ''} - ${booking.endTime || ''})`;
 
             // 5. Purpose/Requirements
             const reqsCell = row.insertCell();
             const filesHtml = booking.files ? `(${booking.files.split(', ').length} file(s) attached)` : '(No files)';
-            reqsCell.innerHTML = `<p>${booking.purpose.substring(0, 50)}...</p><p style="font-size: 0.8em; color: #00A99D;">${filesHtml}</p>`;
+            const purposeText = booking.purpose ? booking.purpose.substring(0, 50) : '';
+            reqsCell.innerHTML = `<p>${purposeText}${booking.purpose && booking.purpose.length > 50 ? '...' : ''}</p><p style="font-size: 0.8em; color: #00A99D;">${filesHtml}</p>`;
 
             // 6. Payment Status/Toggle
             const paymentCell = row.insertCell();
             paymentCell.innerHTML = `
-                <span class="status-${paymentClass}">${booking.paymentStatus}</span><br>
-                <button class="approve-btn" style="margin-top: 5px; padding: 5px 10px;" onclick="handleAdminAction(${booking.id}, '${booking.paymentStatus === 'Paid' ? 'pending' : 'pay'}')">
-                    ${booking.paymentStatus === 'Paid' ? 'Mark Pending' : 'Mark Paid'}
+                <span class="status-${paymentClass}">${paymentStatus}</span><br>
+                <button class="approve-btn" style="margin-top: 5px; padding: 5px 10px;" onclick="handleAdminAction(${booking.id}, '${paymentStatus === 'Paid' ? 'pending' : 'pay'}')">
+                    ${paymentStatus === 'Paid' ? 'Mark Pending' : 'Mark Paid'}
                 </button>
             `;
 
@@ -175,15 +231,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const actionsCell = row.insertCell();
             actionsCell.classList.add('action-buttons');
 
-            if (booking.approvalStatus === 'Pending Review') {
+            if (approvalStatus === 'Pending Review') {
                 actionsCell.innerHTML = `
                     <button class="approve-btn" onclick="handleAdminAction(${booking.id}, 'approve')">Approve</button>
                     <button class="deny-btn" onclick="handleAdminAction(${booking.id}, 'deny')">Deny</button>
                 `;
             } else {
                 actionsCell.innerHTML = `
-                    <span class="status-${booking.approvalStatus.toLowerCase().replace(' ', '-')}" style="white-space: nowrap;">
-                        ${booking.approvalStatus}
+                    <span class="status-${statusClass}" style="white-space: nowrap;">
+                        ${approvalStatus}
                     </span>
                 `;
             }
@@ -192,13 +248,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderBookingSelect = () => {
         const select = document.getElementById('booking-venue');
-        if (!select) return;
+        if (!select) {
+            return;
+        }
 
         select.innerHTML = ''; // Clear previous options
-        VENUES.forEach(venue => {
+        VENUES.forEach((venue) => {
             const option = document.createElement('option');
-            // FIX: Ensure value is the venue name for submission, or ID for lookup consistency
-            option.value = venue.name; 
+            option.value = venue.name;
             option.textContent = venue.name;
             select.appendChild(option);
         });
@@ -206,12 +263,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const switchTab = (tabId) => {
         // Hide all tabs
-        document.querySelectorAll('.portal-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.portal-tab').forEach((tab) => tab.classList.remove('active'));
         // Show the requested tab
-        document.getElementById(tabId).classList.add('active');
+        const target = document.getElementById(tabId);
+        if (target) {
+            target.classList.add('active');
+        }
 
         // Update active class on nav links
-        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach((link) => link.classList.remove('active'));
         const navLink = document.getElementById(`nav-${tabId.replace('-tab', '')}`);
         if (navLink) {
             navLink.classList.add('active');
@@ -228,10 +288,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-
     // --- CAROUSEL LOGIC ---
-
     const updateCarousel = () => {
+        if (totalSlides === 0) {
+            return;
+        }
         const offset = -currentSlide * 100;
         const slideContainer = document.getElementById('carousel-slide');
         if (slideContainer) {
@@ -240,54 +301,62 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const nextSlide = () => {
+        if (totalSlides === 0) {
+            return;
+        }
         currentSlide = (currentSlide + 1) % totalSlides;
         updateCarousel();
     };
 
     const prevSlide = () => {
+        if (totalSlides === 0) {
+            return;
+        }
         currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
         updateCarousel();
     };
-    
-    // --- MAP LOGIC (Pan/Zoom/Hotspot) ---
 
-    // State variables for map interaction
+    // --- MAP LOGIC (Pan/Zoom/Hotspot) ---
+    // State variables for map interaction (prefixed underscored if unused presently)
     let scale = 1;
     let offsetX = 0;
     let offsetY = 0;
-    let isDragging = false;
-    let startX, startY;
+    let _isDragging = false;
+    let _startX;
+    let _startY;
     let mapRect;
 
     const applyTransform = () => {
-        if (!mapScalable) return;
+        if (!mapScalable) {
+            return;
+        }
         mapScalable.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
     };
-    
-    // FIX: Replaced undeclared 'mapContainer' with 'venueMapDisplay'
+
     const restrictBoundaries = () => {
-        if (!venueMapDisplay || scale === 1) return; 
-        
-        // Update rectangle dimensions
+        if (!venueMapDisplay || scale === 1) {
+            return;
+        }
+
         mapRect = venueMapDisplay.getBoundingClientRect();
 
         const maxOffsetX = mapRect.width * (1 - scale);
         const maxOffsetY = mapRect.height * (1 - scale);
-        
-        // Clamp offsets
+
         offsetX = Math.min(0, Math.max(offsetX, maxOffsetX));
         offsetY = Math.min(0, Math.max(offsetY, maxOffsetY));
 
         applyTransform();
-    }
-
+    };
 
     const renderVenueModal = (venue) => {
         const infoPanel = getModalInfoPanel();
-        if (!infoPanel || !venueModal) return; // Ensure modal is defined
+        if (!infoPanel || !venueModal) {
+            return;
+        }
 
-        const statusClass = venue.status.toLowerCase();
-        
+        const statusClass = (venue.status || '').toLowerCase();
+
         infoPanel.innerHTML = `
             <h2>${venue.name}</h2>
             <p>${venue.details}</p>
@@ -298,155 +367,188 @@ document.addEventListener('DOMContentLoaded', () => {
         venueModal.classList.add('show');
     };
 
-
     // --- AUTHENTICATION & SESSION MANAGEMENT ---
-
     const checkSession = () => {
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
         if (currentUser) {
             isAuthenticated = true;
-            splashScreen.classList.add('hidden');
-            mainContent.classList.remove('hidden');
-            currentUsernameSpan.textContent = currentUser.username;
-            userIconToggle.textContent = currentUser.username.charAt(0).toUpperCase();
+            if (splashScreen) {
+                splashScreen.classList.add('hidden');
+            }
+            if (mainContent) {
+                mainContent.classList.remove('hidden');
+            }
+            if (currentUsernameSpan) {
+                currentUsernameSpan.textContent = currentUser.username || '';
+            }
+            if (userIconToggle && currentUser.username) {
+                userIconToggle.textContent = currentUser.username.charAt(0).toUpperCase();
+            }
 
-
-            // Show/Hide Admin Tab
             const isAdmin = currentUser.userType === 'Admin';
-            navAdminReview.classList.toggle('hidden-admin', !isAdmin);
+            if (navAdminReview) {
+                navAdminReview.classList.toggle('hidden-admin', !isAdmin);
+            }
 
-            // Navigate to last active tab or default
             const lastActiveTab = sessionStorage.getItem('lastActiveTab') || 'home-tab';
-            
-            // Check if user is NOT admin but last tab was admin, default to home
-            const targetTab = (lastActiveTab === 'admin-review-tab' && !isAdmin) ? 'home-tab' : lastActiveTab;
+            const targetTab = lastActiveTab === 'admin-review-tab' && !isAdmin ? 'home-tab' : lastActiveTab;
 
             switchTab(targetTab);
-            
-            // Render specific data
+
             renderBookingSelect();
             renderUserBookings();
             renderAdminBookings();
-
         } else {
             isAuthenticated = false;
-            splashScreen.classList.remove('hidden');
-            mainContent.classList.add('hidden');
-            sessionStorage.clear(); // Clear session on non-authenticated load
-            // Ensure login card is visible by default
-            loginCard.classList.remove('hidden');
-            registerCard.classList.add('hidden');
+            if (splashScreen) {
+                splashScreen.classList.remove('hidden');
+            }
+            if (mainContent) {
+                mainContent.classList.add('hidden');
+            }
+            sessionStorage.clear();
+            if (loginCard) {
+                loginCard.classList.remove('hidden');
+            }
+            if (registerCard) {
+                registerCard.classList.add('hidden');
+            }
         }
     };
 
-
     // --- EVENT LISTENERS ---
+    if (showRegisterBtn && loginCard && registerCard) {
+        showRegisterBtn.addEventListener('click', () => {
+            loginCard.classList.add('hidden');
+            registerCard.classList.remove('hidden');
+        });
+    }
 
-    // Login/Register Form Switching
-    showRegisterBtn.addEventListener('click', () => {
-        loginCard.classList.add('hidden');
-        registerCard.classList.remove('hidden');
-    });
+    if (showLoginBtn && loginCard && registerCard) {
+        showLoginBtn.addEventListener('click', () => {
+            registerCard.classList.add('hidden');
+            loginCard.classList.remove('hidden');
+        });
+    }
 
-    showLoginBtn.addEventListener('click', () => {
-        registerCard.classList.add('hidden');
-        loginCard.classList.remove('hidden');
-    });
-    
-    // Register User Type Change (for Admin Key field)
-    registerUserTypeSelect.addEventListener('change', (e) => {
-        const isSelectedAdmin = e.target.value === 'Admin';
-        adminKeyGroup.classList.toggle('hidden', !isSelectedAdmin);
-        registerAdminKeyInput.required = isSelectedAdmin;
-    });
+    if (registerUserTypeSelect && adminKeyGroup && registerAdminKeyInput) {
+        registerUserTypeSelect.addEventListener('change', (e) => {
+            const isSelectedAdmin = e.target.value === 'Admin';
+            adminKeyGroup.classList.toggle('hidden', !isSelectedAdmin);
+            registerAdminKeyInput.required = !!isSelectedAdmin;
+        });
+    }
 
-    // Login Submission
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const username = document.getElementById('login-username').value;
-        const password = document.getElementById('login-password').value;
-        const errorMessage = document.getElementById('error-message');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const usernameEl = document.getElementById('login-username');
+            const passwordEl = document.getElementById('login-password');
+            const username = usernameEl ? usernameEl.value : '';
+            const password = passwordEl ? passwordEl.value : '';
+            const errorMessage = document.getElementById('error-message');
 
-        const users = getStoredUsers();
-        const user = users.find(u => (u.username === username || u.email === username) && u.password === password);
+            const users = getStoredUsers();
+            const user = users.find((u) => (u.username === username || u.email === username) && u.password === password);
 
-        if (user) {
-            // FIX: Ensure userType is stored correctly (used 'role' previously, standardizing to 'userType')
-            sessionStorage.setItem('currentUser', JSON.stringify({...user, userType: user.role || user.userType || 'Student'}));
-            errorMessage.textContent = '';
+            if (user) {
+                sessionStorage.setItem('currentUser', JSON.stringify({ ...user, userType: user.role || user.userType || 'Student' }));
+                if (errorMessage) {
+                    errorMessage.textContent = '';
+                }
+                checkSession();
+            } else if (errorMessage) {
+                errorMessage.textContent = 'Invalid username/email or password.';
+            }
+        });
+    }
+
+    if (registerForm) {
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const errorMessage = document.getElementById('register-error-message');
+            const usernameEl = document.getElementById('register-username');
+            const emailEl = document.getElementById('register-email');
+            const passwordEl = document.getElementById('register-password');
+            const organizationEl = document.getElementById('register-organization');
+
+            const username = usernameEl ? usernameEl.value : '';
+            const email = emailEl ? emailEl.value : '';
+            const password = passwordEl ? passwordEl.value : '';
+            const userType = registerUserTypeSelect ? registerUserTypeSelect.value : 'Student';
+            const organization = organizationEl ? organizationEl.value : '';
+            const adminKey = registerAdminKeyInput ? registerAdminKeyInput.value : '';
+
+            if (userType === 'Admin' && adminKey !== SECRET_ADMIN_KEY) {
+                if (errorMessage) {
+                    errorMessage.textContent = 'Invalid Admin Secret Key.';
+                }
+                return;
+            }
+
+            const users = getStoredUsers();
+            if (users.some((u) => u.username === username)) {
+                if (errorMessage) {
+                    errorMessage.textContent = 'Username already exists.';
+                }
+                return;
+            }
+            if (users.some((u) => u.email === email)) {
+                if (errorMessage) {
+                    errorMessage.textContent = 'Email already exists.';
+                }
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                username,
+                email,
+                password,
+                userType,
+                organization,
+            };
+
+            users.push(newUser);
+            setStoredUsers(users);
+
+            sessionStorage.setItem('currentUser', JSON.stringify(newUser));
+            if (errorMessage) {
+                errorMessage.textContent = '';
+            }
             checkSession();
-        } else {
-            errorMessage.textContent = 'Invalid username/email or password.';
-        }
-    });
+        });
+    }
 
-    // Register Submission
-    registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const errorMessage = document.getElementById('register-error-message');
-        const username = document.getElementById('register-username').value;
-        const email = document.getElementById('register-email').value;
-        const password = document.getElementById('register-password').value;
-        const userType = registerUserTypeSelect.value;
-        const organization = document.getElementById('register-organization').value;
-        const adminKey = registerAdminKeyInput.value;
+    if (trackingForm) {
+        trackingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const refInput = document.getElementById('tracking-ref-id');
+            const refId = refInput ? refInput.value.toUpperCase() : '';
+            const output = document.getElementById('tracking-output');
+            const bookings = getStoredBookings();
+            const booking = bookings.find((b) => b.refId === refId);
 
-        if (userType === 'Admin' && adminKey !== SECRET_ADMIN_KEY) {
-            errorMessage.textContent = 'Invalid Admin Secret Key.';
-            return;
-        }
+            if (!output) {
+                return;
+            }
 
-        let users = getStoredUsers();
-        if (users.some(u => u.username === username)) {
-            errorMessage.textContent = 'Username already exists.';
-            return;
-        }
-        if (users.some(u => u.email === email)) {
-            errorMessage.textContent = 'Email already exists.';
-            return;
-        }
+            if (booking) {
+                output.innerHTML = `
+                    <strong>Status:</strong> <span class="status-${(booking.approvalStatus || 'Pending Review').toLowerCase().replace(/ /g, '-')}">${booking.approvalStatus}</span><br>
+                    <strong>Venue:</strong> ${booking.venue}<br>
+                    <strong>Date:</strong> ${booking.date} (${booking.startTime} - ${booking.endTime})
+                `;
+                output.style.color = '#203F4A';
+            } else {
+                output.textContent = 'Error: Reference ID not found.';
+                output.style.color = '#d32f2f';
+            }
+        });
+    }
 
-        const newUser = {
-            id: Date.now(),
-            username,
-            email,
-            password,
-            userType,
-            organization
-        };
-
-        users.push(newUser);
-        setStoredUsers(users);
-
-        // Auto-login new user
-        sessionStorage.setItem('currentUser', JSON.stringify(newUser));
-        errorMessage.textContent = '';
-        checkSession();
-    });
-
-    // Tracking Form Submission
-    trackingForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const refId = document.getElementById('tracking-ref-id').value.toUpperCase();
-        const output = document.getElementById('tracking-output');
-        const bookings = getStoredBookings();
-        const booking = bookings.find(b => b.refId === refId);
-
-        if (booking) {
-            output.innerHTML = `
-                <strong>Status:</strong> <span class="status-${booking.approvalStatus.toLowerCase().replace(' ', '-')}">${booking.approvalStatus}</span><br>
-                <strong>Venue:</strong> ${booking.venue}<br>
-                <strong>Date:</strong> ${booking.date} (${booking.startTime} - ${booking.endTime})
-            `;
-            output.style.color = '#203F4A';
-        } else {
-            output.textContent = 'Error: Reference ID not found.';
-            output.style.color = '#d32f2f';
-        }
-    });
-
-    // Header Navigation
-    document.querySelectorAll('.nav-link').forEach(link => {
+    const navLinks = document.querySelectorAll('.nav-link') || [];
+    navLinks.forEach((link) => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const tabId = e.target.id.replace('nav-', '') + '-tab';
@@ -454,159 +556,170 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-  // User Dropdown Toggle
-userIconToggle.addEventListener('click', (e) => {
-    e.preventDefault();
-    // Do NOT use e.stopPropagation() here if using this timeout.
-    
-    // Use a small delay (10ms) to bypass the same-tick conflict.
-    setTimeout(() => {
-        userDropdown.classList.toggle('show');
-    }, 10); 
-});
-
-    // Logout
-    logoutBtn.addEventListener('click', () => {
-        sessionStorage.removeItem('currentUser');
-        sessionStorage.removeItem('lastActiveTab');
-        isAuthenticated = false;
-        userDropdown.classList.remove('show');
-        checkSession();
-    });
-    
-    // Booking Form Submission
-    const bookingForm = document.getElementById('booking-form');
-    bookingForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const bookingMessage = document.getElementById('booking-message');
-        
-        // Basic form validation (for time clash, a server would be needed)
-        const venueName = document.getElementById('booking-venue').value;
-        const date = document.getElementById('booking-date').value;
-        const startTime = document.getElementById('booking-start-time').value;
-        const endTime = document.getElementById('booking-end-time').value;
-        const purpose = document.getElementById('booking-purpose').value;
-        // FIX: Changed ID to match HTML
-        const files = document.getElementById('booking-requirements-file').files; 
-        const fileNames = Array.from(files).map(f => f.name).join(', ');
-
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-
-        // Simple unique ID for booking (not globally unique, but unique for the session)
-        const refId = 'REF-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-
-        const newBooking = {
-            id: Date.now(),
-            refId: refId,
-            userId: currentUser.id,
-            username: currentUser.username,
-            userRole: currentUser.userType,
-            venue: venueName,
-            date: date,
-            startTime: startTime,
-            endTime: endTime,
-            purpose: purpose,
-            files: fileNames,
-            approvalStatus: 'Pending Review',
-            paymentStatus: 'Pending' // Initial payment status
-        };
-
-        const bookings = getStoredBookings();
-        bookings.push(newBooking);
-        setStoredBookings(bookings);
-
-        bookingMessage.textContent = `Success! Your reservation for ${venueName} is submitted. Reference ID: ${refId}`;
-        bookingMessage.style.color = '#00A99D'; // Green for success
-        bookingForm.reset();
-
-        renderUserBookings(); // Refresh user table
-        renderAdminBookings(); // Refresh admin table
-    });
-
-    // Sub-tab switching logic for My Bookings
-    document.querySelectorAll('.tabs .tab-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            // Remove active from all buttons and content
-            document.querySelectorAll('.tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            // Add active to clicked button
-            e.target.classList.add('active');
-
-            // Show corresponding content
-            const targetTabId = e.target.dataset.tab;
-            document.getElementById(targetTabId).classList.add('active');
+    if (userIconToggle && userDropdown) {
+        userIconToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            setTimeout(() => {
+                userDropdown.classList.toggle('show');
+            }, 10);
         });
-    });
+    }
 
+    if (logoutBtn && userDropdown) {
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('currentUser');
+            sessionStorage.removeItem('lastActiveTab');
+            isAuthenticated = false;
+            userDropdown.classList.remove('show');
+            checkSession();
+        });
+    }
 
-    // --- CAROUSEL BUTTON EVENT LISTENERS (NEW) ---
+    const bookingForm = document.getElementById('booking-form');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const bookingMessage = document.getElementById('booking-message');
+
+            const bookingVenueEl = document.getElementById('booking-venue');
+            const bookingDateEl = document.getElementById('booking-date');
+            const bookingStartEl = document.getElementById('booking-start-time');
+            const bookingEndEl = document.getElementById('booking-end-time');
+            const bookingPurposeEl = document.getElementById('booking-purpose');
+            const bookingFileEl = document.getElementById('booking-requirements-file');
+
+            const venueName = bookingVenueEl ? bookingVenueEl.value : '';
+            const date = bookingDateEl ? bookingDateEl.value : '';
+            const startTime = bookingStartEl ? bookingStartEl.value : '';
+            const endTime = bookingEndEl ? bookingEndEl.value : '';
+            const purpose = bookingPurposeEl ? bookingPurposeEl.value : '';
+            const files = bookingFileEl ? bookingFileEl.files : [];
+            const fileNames = Array.from(files).map((f) => f.name).join(', ');
+
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+            if (!currentUser) {
+                if (bookingMessage) {
+                    bookingMessage.textContent = 'You must be logged in to make a booking.';
+                    bookingMessage.style.color = '#d32f2f';
+                }
+                return;
+            }
+
+            const refId = 'REF-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+            const newBooking = {
+                id: Date.now(),
+                refId,
+                userId: currentUser.id,
+                username: currentUser.username,
+                userRole: currentUser.userType,
+                venue: venueName,
+                date,
+                startTime,
+                endTime,
+                purpose,
+                files: fileNames,
+                approvalStatus: 'Pending Review',
+                paymentStatus: 'Pending',
+            };
+
+            const bookings = getStoredBookings();
+            bookings.push(newBooking);
+            setStoredBookings(bookings);
+
+            if (bookingMessage) {
+                bookingMessage.textContent = `Success! Your reservation for ${venueName} is submitted. Reference ID: ${refId}`;
+                bookingMessage.style.color = '#00A99D';
+            }
+            bookingForm.reset();
+
+            renderUserBookings();
+            renderAdminBookings();
+        });
+    }
+
+    const subTabButtons = document.querySelectorAll('.tabs .tab-btn') || [];
+    if (subTabButtons.length > 0) {
+        subTabButtons.forEach((button) => {
+            button.addEventListener('click', (e) => {
+                document.querySelectorAll('.tabs .tab-btn').forEach((btn) => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach((content) => content.classList.remove('active'));
+
+                e.target.classList.add('active');
+
+                const targetTabId = e.target.dataset.tab;
+                const targetContent = document.getElementById(targetTabId);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+    }
+
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     if (prevBtn && nextBtn) {
         prevBtn.addEventListener('click', prevSlide);
         nextBtn.addEventListener('click', nextSlide);
     }
-    
-   
-    // --- HOTSPOT & MODAL FUNCTIONALITY ---
 
-    mapHotspots.forEach(hotspot => {
-        hotspot.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevents map dragging/panning from interfering
+    if (mapHotspots && mapHotspots.length > 0) {
+        mapHotspots.forEach((hotspot) => {
+            hotspot.addEventListener('click', (e) => {
+                e.stopPropagation();
 
-            const venueId = parseInt(hotspot.dataset.venueId);
-            const venue = VENUES.find(v => v.id === venueId);
-            
-            if (venue) {
-                renderVenueModal(venue);
-            }
+                const venueId = Number.parseInt(hotspot.dataset.venueId, 10);
+                const venue = VENUES.find((v) => v.id === venueId);
+
+                if (venue) {
+                    renderVenueModal(venue);
+                }
+            });
         });
-    });
+    }
 
-    // Close Modal on Close Button Click
-    if (closeBtn) {
+    if (closeBtn && venueModal) {
         closeBtn.addEventListener('click', () => {
             venueModal.classList.remove('show');
         });
     }
 
-    // Close Modal on Outside Click
     window.addEventListener('click', (event) => {
-        if (event.target === venueModal) {
+        if (venueModal && event.target === venueModal) {
             venueModal.classList.remove('show');
+            return;
         }
-    });
 
-    // Handle "Proceed to Booking" button click inside modal
-    window.addEventListener('click', (e) => {
-        if (e.target.id === 'details-book-btn') {
-            const venueName = e.target.dataset.venueName;
-            
-            // 1. Close the modal
-            venueModal.classList.remove('show');
-            
-            // 2. Switch to the Booking tab
+        if (event.target && event.target.id === 'details-book-btn') {
+            const venueName = event.target.dataset.venueName;
+
+            if (venueModal) {
+                venueModal.classList.remove('show');
+            }
+
             switchTab('bookings-tab');
 
-            // 3. Select the venue in the dropdown
             const bookingSelect = document.getElementById('booking-venue');
             if (bookingSelect) {
                 bookingSelect.value = venueName;
             }
 
-            // Ensure the 'New Booking' sub-tab is selected and active
-            document.querySelectorAll('.tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.querySelector('.tabs .tab-btn[data-tab="new-booking-section"]').classList.add('active');
-            document.getElementById('new-booking-section').classList.add('active');
+            document.querySelectorAll('.tabs .tab-btn').forEach((btn) => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach((content) => content.classList.remove('active'));
+            const btn = document.querySelector('.tabs .tab-btn[data-tab="new-booking-section"]');
+            if (btn) {
+                btn.classList.add('active');
+            }
+            const newBookingSection = document.getElementById('new-booking-section');
+            if (newBookingSection) {
+                newBookingSection.classList.add('active');
+            }
         }
     });
 
-
     // --- INITIALIZATION ---
     window.renderAdminBookings = renderAdminBookings;
-    window.renderVenueModal = renderVenueModal; 
+    window.renderVenueModal = renderVenueModal;
 
     checkSession();
 });
