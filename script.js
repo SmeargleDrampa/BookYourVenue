@@ -454,15 +454,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-   // User Dropdown Toggle
+  // User Dropdown Toggle
 userIconToggle.addEventListener('click', (e) => {
-    // Crucial: Stops the event from reaching the document handler
-    e.stopPropagation(); 
+    e.preventDefault();
+    // Do NOT use e.stopPropagation() here if using this timeout.
     
-    // Optional, but good practice if the icon is an <a> tag
-    e.preventDefault(); 
-    
-    userDropdown.classList.toggle('show');
+    // Use a small delay (10ms) to bypass the same-tick conflict.
+    setTimeout(() => {
+        userDropdown.classList.toggle('show');
+    }, 10); 
 });
 
     // Logout
